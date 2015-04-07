@@ -68,48 +68,58 @@ BroccoliAngularTemplateCache.prototype.description = 'angular templates cache';
 
 
 BroccoliAngularTemplateCache.prototype.updateCache = function(srcDir, destDir) {
-	var self = this,dest;
+	
+	var self 		= this;
+	var templates 	= [];
 
-	var src = path.join(srcDir[0],self.options.srcDir);
+	// normalize options
+	var options 	= {
+		minify 		: 	self.options.minify || false,
+		prepend 	:	self.options.prepend || false,
+		strip 		: 	self.options.strip || false,
+		moduleName 	: 	self.options.moduleName,
+		firstFile 	: 	null,
+		srcDir 		: 	self.options.srcDir || './',
+		fileName 	: 	self.options.fileName || 'template-cache.js',
+		destDir  	: 	self.options.destDir || './',
+		absolute 	: 	self.options.absolute || false
+	};
+ 
+	var src 		= 	path.join(srcDir[0], options.srcDir);
+	var dest 		= 	path.join(destDir, options.destDir, options.fileName);
 
-  if(self.options.absolute){
-    dest = self.options.destDir+'/'+self.options.fileName;
-  }else{
-    dest = path.join(destDir,self.options.destDir+'/'+self.options.fileName);
-  }
 	mkdirp.sync(path.dirname(dest));
 
-	var promise = new rsvp.Promise(function(resolvePromise, rejectPromise) {
+	var promise = new rsvp.Promise(function(fullfill, reject) {
 		recursive(src, function (err, files) {
 
-			var templates = [],
-			minify = self.options.minify || false,
-			prepend = self.options.prepend || false,
-			strip = self.options.strip || false,
-			moduleName = self.options.moduleName,
-			firstFile = null,
-			filePath;
+			_.each(files, function(fileLocation){
 
-			_.each(files, function(file){
-				if(self.options.absolute){
-					filePath = file.replace(path.dirname(srcDir[0])+'/','');
+				if(! options.absolute){
+					var file = fileLocation.replace(path.normalize(src), '');
 				}
+				
 				templates.push({
-					path: filePath || file,
-					content: fs.readFileSync(file).toString('utf-8')
+					path: file || fileLocation,
+					content: fs.readFileSync(fileLocation).toString('utf-8')
 				});
+
 			});
-			var joinedContents = transformTemplates(templates, strip, prepend, minify);
-			var module = angularModuleTemplate(moduleName, joinedContents);
+
+			var joinedContents = transformTemplates(templates, options.strip, options.prepend, options.minify);
+			var module = angularModuleTemplate(options.moduleName, joinedContents);
+
 			fs.writeFile(dest,module,function(err){
 				if(err){
-					rejectPromise(err);
+					reject(err);
 				}else{
-					resolvePromise('templates created');
+					fullfill('templates created');
 				}
 			});
 		});
 	});
+
 	return promise;
+
 }
 module.exports = BroccoliAngularTemplateCache;
