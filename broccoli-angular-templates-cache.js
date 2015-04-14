@@ -33,6 +33,13 @@ function transformTemplateEntry(entry, strip, prepend, minify) {
 	var path = entry.path,
 	content = entry.content,
 	parseError;
+	
+	// Normalize windows only
+    if (process.platform === 'win32') {
+      path = path.replace(/\\/g, '/');
+    }
+
+
 	if (strip) {
 		path = path.split(strip);
 		path.shift();
