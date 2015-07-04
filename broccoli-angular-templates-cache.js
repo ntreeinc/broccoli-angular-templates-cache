@@ -33,7 +33,7 @@ function transformTemplateEntry(entry, strip, prepend, minify) {
 	var path = entry.path,
 	content = entry.content,
 	parseError;
-	
+
 	// Normalize windows only
     if (process.platform === 'win32') {
       path = path.replace(/\\/g, '/');
@@ -67,6 +67,7 @@ var BroccoliAngularTemplateCache = function BroccoliAngularTemplateCache(inTree,
   }
   this.inputTree = inTree;
   this.options = options || {};
+
 	CachingWriter.apply(this, arguments);
 };
 BroccoliAngularTemplateCache.prototype = Object.create(CachingWriter.prototype);
@@ -75,23 +76,23 @@ BroccoliAngularTemplateCache.prototype.description = 'angular templates cache';
 
 
 BroccoliAngularTemplateCache.prototype.updateCache = function(srcDir, destDir) {
-	
+
 	var self 		= this;
 	var templates 	= [];
 
 	// normalize options
 	var options 	= {
-		minify 		: 	self.options.minify || false,
-		prepend 	:	self.options.prepend || false,
-		strip 		: 	self.options.strip || false,
-		moduleName 	: 	self.options.moduleName,
+		minify 		: 	self.minify || false,
+		prepend 	:	self.prepend || false,
+		strip 		: 	self.strip || false,
+		moduleName 	: 	self.moduleName,
 		firstFile 	: 	null,
-		srcDir 		: 	self.options.srcDir || './',
-		fileName 	: 	self.options.fileName || 'template-cache.js',
-		destDir  	: 	self.options.destDir || './',
+		srcDir 		: 	self.srcDir || './',
+		fileName 	: 	self.fileName || 'template-cache.js',
+		destDir  	: 	self.destDir || './',
 		absolute 	: 	self.options.absolute || false
 	};
- 
+
 	var src 		= 	path.join(srcDir[0], options.srcDir);
 	var dest 		= 	path.join(destDir, options.destDir, options.fileName);
 
@@ -105,7 +106,7 @@ BroccoliAngularTemplateCache.prototype.updateCache = function(srcDir, destDir) {
 				if(! options.absolute){
 					var file = fileLocation.replace(path.normalize(src), '');
 				}
-				
+
 				templates.push({
 					path: file || fileLocation,
 					content: fs.readFileSync(fileLocation).toString('utf-8')
