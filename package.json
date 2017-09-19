@@ -14,9 +14,9 @@
     "broccoli": "^0.13.3",
     "broccoli-caching-writer": "^0.5.4",
     "html-minifier": "^0.6.9",
-    "lodash": "^2.4.1",
+    "lodash": "^4.0.1",
     "mkdirp": "^0.5.0",
-    "recursive-readdir": "^1.2.1",
+    "recursive-readdir": "^2.2.1",
     "rsvp": "^3.0.16"
   },
   "keywords": [
