@@ -53,8 +53,7 @@ function transformTemplateEntry(entry, strip, prepend, minify) {
 			content = htmlMin(content, minify);
 		} catch (e) {
 			parseError = String(e);
-			content = '<h1>Invalid template: ' + entry.path + '</h1>' +
-			'<pre>' + escapeTags(parseError) + '</pre>';
+			throw new Error(parseError, entry.path);
 		}
 	}
 	content = escapeHtmlContent(content);
